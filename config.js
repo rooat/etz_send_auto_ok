@@ -4,11 +4,12 @@ var web3 = new Web3("http://etzrpc.org");
 var {Power} = require('./util/power');
 web3.extend(Power)
 
-var {Account,Contracts,Transaction,NetRpc} = require('./db');
+var {Account,Contracts,Transaction,NetRpc,Logset} = require('./db');
 var Common = require('./util/common')
 module.exports ={
     web3,
     Transaction,
     Common,
     Account,
+    Logset
 }

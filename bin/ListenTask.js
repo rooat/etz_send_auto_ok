@@ -50,10 +50,14 @@ class ETZEventListener {
                         let value = receipt.value;
                         let from = receipt.from;
                         console.log("用户喂养:地址:"+from+",喂养金额："+value+",区块高度："+receipt.blockNumber);
-
+                        await config.Logset({
+                          task:"feed"
+                        }).save()
                       }else if(input_str == "0xe70ee385"){
                         console.log("公告新的轮次")
-
+                        await config.Logset({
+                          task:"公告新的轮次"
+                        }).save()
                       }else if(input_str == "0x1cecff48"){//开启轮次
                         console.log("在仓位："+phenixIndex+",新的轮次开启成功！区块高度："+receipt.blockNumber);
                         let data= await this.instanceToken.methods.feed(0,phenixIndex,200*10**18).encodeABI();
@@ -63,15 +67,24 @@ class ETZEventListener {
                             "address":this.gameContract,
                             "data":data
                           }).save()
-                        
+                        await config.Logset({
+                          task:"新的轮次开启成功"
+                        }).save() 
                       }else if(input_str == "0xaa2d6081"){//创建仓位
                         console.log("开启新的仓位！");
-
+                        await config.Logset({
+                          task:"开启新的仓位"
+                        }).save() 
                       }else if(input_str == "0xd66d6c10"){
                         console.log("注册新用户")
-
+                        await config.Logset({
+                          task:"注册新用户"
+                        }).save()
                       }else if(input_str == "0xb6b55f25"){
                         console.log("用户充值成功");
+                        await config.Logset({
+                          task:"用户充值成功"
+                        }).save()
                       }
                     }
                   }

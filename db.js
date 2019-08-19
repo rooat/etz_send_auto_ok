@@ -54,10 +54,16 @@ var NetRpc = new Schema({
   createAt : {type : Date ,default : Date.now},
   updateAt : {type : Date},
 })
+
+var Logset = new Schema({
+  task :{type:String},
+  createAt : {type : Date ,default : Date.now},
+})
 module.exports.Account = mongoose.model('account',Account);
 module.exports.Contracts = mongoose.model('contract',Contracts);
 module.exports.Transaction = mongoose.model('transaction', Transaction);
 module.exports.NetRpc = mongoose.model('netrpc', NetRpc);
+module.exports.Logset = mongoose.model('logset',Logset);
 
 mongoose.connect('mongodb://localhost:27017/auto_send', { useNewUrlParser: true, useFindAndModify:false });
 mongoose.set('debug', false);
