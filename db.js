@@ -10,6 +10,15 @@ var Account = new Schema({
   updateAt : {type : Date}, 
 })
 
+var UserData = new Schema({
+  uuid :{type :String},
+  username :{type:String},
+  address : {type : String},
+  balance :{type: String},
+  createAt : {type : Date ,default : Date.now},
+  updateAt : {type : Date}
+})
+
 var Contracts = new Schema({
   uuid : {type : String},
   net_kind : {type : String},
@@ -60,6 +69,7 @@ var Logset = new Schema({
   createAt : {type : Date ,default : Date.now},
 })
 module.exports.Account = mongoose.model('account',Account);
+module.exports.UserData = mongoose.model('userdata', UserData);
 module.exports.Contracts = mongoose.model('contract',Contracts);
 module.exports.Transaction = mongoose.model('transaction', Transaction);
 module.exports.NetRpc = mongoose.model('netrpc', NetRpc);

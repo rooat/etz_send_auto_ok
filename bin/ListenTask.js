@@ -95,9 +95,12 @@ class ETZEventListener {
     let accountData = await this.instanceToken.methods.account(this.sender,0).call();
    
     let invetsVal = accountData.balance;
-    if(accountData.balance > phenixRoundData.maxInvest){
+    let balance = 0;
+    if(invetsVal > phenixRoundData.maxInvest){
       invetsVal = phenixRoundData.maxInvest;
+      balance = Number(invetsVal)-Number(phenixRoundData.maxInvest);
     }
+    
     invetsVal = config.web3.utils.toWei(String(Number(invetsVal)/10**18),'ether');
     let data= await this.instanceToken.methods.feed(0,phenixIndex,invetsVal).encodeABI();
     await config.Transaction({
@@ -106,6 +109,9 @@ class ETZEventListener {
         "address":this.gameContract,
         "data":data
       }).save()
+    await config.UserData.updateOne({
+      "address":this.sender.toLocaleLowerCase()
+    },{$set:{"balance":balance,"updateAt":new Date().getTime()}})
   }
 }
 
