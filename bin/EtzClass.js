@@ -28,7 +28,7 @@ class EtzClass{
     setInterval(async function(){
       if(this.txArr.length==0){
         this.txArr = await Transaction.find({net_kind:"etz",state:0}).sort({'priority':1}).exec();
-        // console.log(`sendTx....started ${this.txArr.length} tx`)
+        console.log(`sendTx....started ${this.txArr.length} tx`)
         if (this.txArr.length > 0) {
           clearInterval(this.sendTask);
           this.sendTask = setInterval(this.sendProcess.bind(this), 2000)

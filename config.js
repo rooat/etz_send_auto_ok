@@ -1,6 +1,6 @@
 var Web3 = require('web3');
 //var net = require('net');
-var web3 = new Web3("http://etzrpc.org");
+var web3 = new Web3("https://etzrpc.org");
 var {Power} = require('./util/power');
 web3.extend(Power)
 

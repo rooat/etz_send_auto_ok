@@ -27,7 +27,8 @@ class ETZEventListener {
            that.exFun()
            that.netBlock++;
         }
-    },1000);
+        
+      },1000);
   }
   async exFun(){
       if (this.currentBlockNumber < this.netBlock) {
@@ -60,13 +61,7 @@ class ETZEventListener {
                         }).save()
                       }else if(input_str == "0x1cecff48"){//开启轮次
                         console.log("在仓位："+phenixIndex+",新的轮次开启成功！区块高度："+receipt.blockNumber);
-                        let data= await this.instanceToken.methods.feed(0,phenixIndex,200*10**18).encodeABI();
-                        await config.Transaction({
-                            "net_kind" : "etz",
-                            "sender":this.sender.toLocaleLowerCase(),
-                            "address":this.gameContract,
-                            "data":data
-                          }).save()
+                        this.createTransaction(phenixIndex); 
                         await config.Logset({
                           task:"新的轮次开启成功"
                         }).save() 
@@ -92,8 +87,25 @@ class ETZEventListener {
               }
             })
           }
-
-        }
+       }
+  }
+  async createTransaction(phenixIndex){
+    let maxRound =await this.instanceToken.methods.getMaxRoundIndex(phenixIndex).call();
+    let phenixRoundData = await this.instanceToken.methods.getRound(phenixIndex,maxRound).call();
+    let accountData = await this.instanceToken.methods.account(this.sender,0).call();
+   
+    let invetsVal = accountData.balance;
+    if(accountData.balance > phenixRoundData.maxInvest){
+      invetsVal = phenixRoundData.maxInvest;
+    }
+    console.log(invetsVal)
+    let data= await this.instanceToken.methods.feed(0,phenixIndex,invetsVal).encodeABI();
+    await config.Transaction({
+        "net_kind" : "etz",
+        "sender":this.sender.toLocaleLowerCase(),
+        "address":this.gameContract,
+        "data":data
+      }).save()
   }
 }
 
