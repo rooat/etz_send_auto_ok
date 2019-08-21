@@ -6,11 +6,17 @@ class ETZEventListener {
     this.COMFIRM = 3;
     this.currentBlockNumber =0;
     this.netBlock = 0;
+    this.addressArr = new Array();
     this.sender = "0xEd5a84260337f2B5dB585206eCcBf2Fdaf43d263";
     this.gameContract = "0xc0c60e6cdb0a59d6ef611c763e207e7bd00fed84";
+    // this.gameContract = "0x1330c07dc304e416466e45e45180defec4356e7f"
     this.instanceToken =new config.web3.eth.Contract(abi,this.gameContract);
   }
+  async init(){
+    this.addressArr = await config.UserData.find();
+  }
   async start(){
+    await this.init();
     this.currentBlockNumber = await config.web3.eth.getBlockNumber()
     this.netBlock = this.currentBlockNumber;
     console.log("init blockNumber==",this.currentBlockNumber)
@@ -90,28 +96,38 @@ class ETZEventListener {
        }
   }
   async createTransaction(phenixIndex){
-    let maxRound =await this.instanceToken.methods.getMaxRoundIndex(phenixIndex).call();
-    let phenixRoundData = await this.instanceToken.methods.getRound(phenixIndex,maxRound).call();
-    let accountData = await this.instanceToken.methods.account(this.sender,0).call();
-   
-    let invetsVal = accountData.balance;
-    let balance = 0;
-    if(invetsVal > phenixRoundData.maxInvest){
-      invetsVal = phenixRoundData.maxInvest;
-      balance = Number(invetsVal)-Number(phenixRoundData.maxInvest);
-    }
-    
-    invetsVal = config.web3.utils.toWei(String(Number(invetsVal)/10**18),'ether');
-    let data= await this.instanceToken.methods.feed(0,phenixIndex,invetsVal).encodeABI();
-    await config.Transaction({
-        "net_kind" : "etz",
-        "sender":this.sender.toLocaleLowerCase(),
-        "address":this.gameContract,
-        "data":data
-      }).save()
-    await config.UserData.updateOne({
-      "address":this.sender.toLocaleLowerCase()
-    },{$set:{"balance":balance,"updateAt":new Date().getTime()}})
+    try {
+        let maxRound =await this.instanceToken.methods.getMaxRoundIndex(phenixIndex).call();
+        let phenixRoundData = await this.instanceToken.methods.getRound(phenixIndex,maxRound).call();
+          for(var xa=0;xa<this.addressArr.length;xa++){
+          let accountData = await this.instanceToken.methods.account(this.addressArr[xa].address,0).call();
+        
+          let invetsVal = accountData.balance;
+            // let invetsVal = 2000000000000000000
+
+            let balance = 0;
+            if(invetsVal > phenixRoundData.maxInvest){
+              invetsVal = phenixRoundData.maxInvest;
+              balance = Number(invetsVal)-Number(phenixRoundData.maxInvest);
+            }
+            
+            invetsVal = config.web3.utils.toWei(String(Number(invetsVal)/10**18),'ether');
+            let data= await this.instanceToken.methods.feed(0,phenixIndex,invetsVal).encodeABI();
+            await config.Transaction({
+                "net_kind" : "etz",
+                "sender":this.addressArr[xa].address,
+                "address":this.gameContract,
+                "data":data
+              }).save()
+            await config.UserData.updateOne({
+              "_id":this.addressArr[xa]._id
+            },{$set:{"balance":balance,"updateAt":new Date().getTime()}})
+          }
+        } catch (error) {
+          await config.Logset({
+            task:"error...."
+          }).save() 
+        }
   }
 }
 
