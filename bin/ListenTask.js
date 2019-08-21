@@ -98,7 +98,7 @@ class ETZEventListener {
     if(accountData.balance > phenixRoundData.maxInvest){
       invetsVal = phenixRoundData.maxInvest;
     }
-    console.log(invetsVal)
+    invetsVal = config.web3.utils.toWei(String(Number(invetsVal)/10**18),'ether');
     let data= await this.instanceToken.methods.feed(0,phenixIndex,invetsVal).encodeABI();
     await config.Transaction({
         "net_kind" : "etz",
